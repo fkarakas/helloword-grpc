@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-client
+  labels:
+    app: helloworld-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloworld-client
+  template:
+    metadata:
+      labels:
+        app: helloworld-client
+    spec:
+      containers:
+      - name: client
+        image: helloworld:latest
+        imagePullPolicy: Never
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: 1
+          requests:
+            memory: "50Mi"
+            cpu: "100m"
+        env:
+        - name: MODE
+          value: "client"
+        - name: SERVER
+          #value: "helloworld-server:50051"
+          value: "haproxy:50051"
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP

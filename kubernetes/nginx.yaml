@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: server
+        image: nginx
+        #imagePullPolicy: Never
+        ports:
+        - containerPort: 50051
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: 1
+          requests:
+            memory: "50Mi"
+            cpu: "100m"
+#        readinessProbe:
+#          tcpSocket:
+#            port: 50051
+#          initialDelaySeconds: 5
+#          periodSeconds: 10
+#        livenessProbe:
+#          tcpSocket:
+#            port: 50051
+#          initialDelaySeconds: 15
+#          periodSeconds: 20
+#        env:
+#        - name: MODE
+#          value: "server"
+#        - name: POD_IP
+#          valueFrom:
+#            fieldRef:
+#              fieldPath: status.podIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 50051
+    targetPort: 50051
+    

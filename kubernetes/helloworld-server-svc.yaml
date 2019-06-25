@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld-server
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: helloworld-server
+  ports:
+  - protocol: TCP
+    port: 50051
+    targetPort: 50051

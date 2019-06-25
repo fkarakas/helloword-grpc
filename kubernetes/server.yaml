@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld-server
+  labels:
+    app: helloworld-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: helloworld-server
+  template:
+    metadata:
+      labels:
+        app: helloworld-server
+    spec:
+      containers:
+      - name: server
+        image: helloworld:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 50051
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: 1
+          requests:
+            memory: "50Mi"
+            cpu: "100m"
+#        readinessProbe:
+#          tcpSocket:
+#            port: 50051
+#          initialDelaySeconds: 5
+#          periodSeconds: 10
+#        livenessProbe:
+#          tcpSocket:
+#            port: 50051
+#          initialDelaySeconds: 15
+#          periodSeconds: 20
+        env:
+        - name: MODE
+          value: "server"
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloworld-server
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: helloworld-server
+  ports:
+  - protocol: TCP
+    port: 50051
+    targetPort: 50051
