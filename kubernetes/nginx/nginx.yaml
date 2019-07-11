@@ -17,7 +17,6 @@ spec:
       containers:
       - name: server
         image: nginx
-        #imagePullPolicy: Never
         ports:
         - containerPort: 50051
         resources:
@@ -27,24 +26,6 @@ spec:
           requests:
             memory: "50Mi"
             cpu: "100m"
-#        readinessProbe:
-#          tcpSocket:
-#            port: 50051
-#          initialDelaySeconds: 5
-#          periodSeconds: 10
-#        livenessProbe:
-#          tcpSocket:
-#            port: 50051
-#          initialDelaySeconds: 15
-#          periodSeconds: 20
-#        env:
-#        - name: MODE
-#          value: "server"
-#        - name: POD_IP
-#          valueFrom:
-#            fieldRef:
-#              fieldPath: status.podIP
-
 ---
 apiVersion: v1
 kind: Service
