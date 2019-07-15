@@ -1,3 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grpc-config
+data:
+  grpc.conf: |
+    upstream grpcservers {
+        server helloworld-server:50051;
+    }
+    server {
+      listen 50051 http2;
+      resolver 8.8.8.8;
+        location / {
+          grpc_pass grpc://grpcservers;
+        }
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,6 +31,10 @@ spec:
       labels:
         app: nginx
     spec:
+      volumes:
+      - name: grpc-config-volume
+        configMap:
+          name: grpc-config
       containers:
       - name: server
         image: nginx
@@ -26,6 +47,10 @@ spec:
           requests:
             memory: "50Mi"
             cpu: "100m"
+        volumeMounts:
+        - name: grpc-config-volume
+          mountPath: /etc/nginx/conf.d/
+
 ---
 apiVersion: v1
 kind: Service
