@@ -5,7 +5,7 @@ metadata:
 data:
   grpc.conf: |
     upstream grpcservers {
-        server helloworld-server:50051;
+        server helloworld-grpc-server:50051;
     }
     server {
       listen 50051 http2;

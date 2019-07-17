@@ -4,12 +4,6 @@ metadata:
   name: haproxy-config
 data:
   haproxy.cfg: |
-    resolvers kubedns
-      nameserver dns1 10.96.0.10:53
-      resolve_retries 10
-      timeout retry   10s
-      hold valid      10s
-
     global
       log stdout local0
       maxconn 50000
@@ -32,9 +26,7 @@ data:
 
     backend be_servers
       balance roundrobin
-      server server1 helloworld-server.default.svc.cluster.local:50051 check maxconn 20 proto h2
-      #server server1 helloworld-server.default.svc.cluster.local:50051 check resolvers kubedns check maxconn 20 alpn h2
-      #server server1 helloworld-server.default.svc.cluster.local:50051 check maxconn 20 alpn h2
+      server server1 helloworld-grpc-server.fatih.svc.cluster.local:50051 check maxconn 20 proto h2
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -59,7 +51,7 @@ spec:
       containers:
       - name: server
         image: haproxy
-        imagePullPolicy: Never
+        imagePullPolicy: Always
         ports:
         - containerPort: 50051
         resources:
@@ -78,8 +70,8 @@ kind: Service
 metadata:
   name: haproxy
 spec:
-  #type: ClusterIP
-  #clusterIP: None
+  type: ClusterIP
+  clusterIP: None
   selector:
     app: haproxy
   ports:

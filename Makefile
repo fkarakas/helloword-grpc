@@ -1,7 +1,10 @@
 VERSION ?= latest
 
-build-image:
-	docker build -t helloworld:$(VERSION) .
+build-image: build
+	docker build -t fkarakas/helloworld-grpc:$(VERSION) .
+
+push-image: build-image
+	docker push fkarakas/helloworld-grpc:$(VERSION)
 
 build:
 	go build -o hello-server ./server

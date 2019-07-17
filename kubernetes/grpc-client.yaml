@@ -1,23 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: helloworld-client
+  name: helloworld-grpc-client
   labels:
-    app: helloworld-client
+    app: helloworld-grpc-client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: helloworld-client
+      app: helloworld-grpc-client
   template:
     metadata:
+      annotations:
+        linkerd.io/inject: enabled
       labels:
-        app: helloworld-client
+        app: helloworld-grpc-client
     spec:
       containers:
       - name: client
-        image: helloworld:latest
-        imagePullPolicy: Never
+        image: fkarakas/helloworld-grpc:latest
+        imagePullPolicy: Always
         resources:
           limits:
             memory: "1Gi"
@@ -29,8 +31,9 @@ spec:
         - name: MODE
           value: "client"
         - name: SERVER
-          #value: "helloworld-server:50051"
-          value: "haproxy:50051"
+          value: "helloworld-grpc-server:50051"
+          #value: "haproxy:50051"
+          #value: "nginx:50051"
         - name: POD_IP
           valueFrom:
             fieldRef:

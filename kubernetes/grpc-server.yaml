@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: helloworld-server
+  name: helloworld-grpc-server
 spec:
   type: ClusterIP
   clusterIP: None
   selector:
-    app: helloworld-server
+    app: helloworld-grpc-server
   ports:
   - protocol: TCP
     port: 50051
@@ -15,23 +15,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: helloworld-server
+  name: helloworld-grpc-server
   labels:
-    app: helloworld-server
+    app: helloworld-grpc-server
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: helloworld-server
+      app: helloworld-grpc-server
   template:
     metadata:
+      annotations:
+        linkerd.io/inject: enabled
       labels:
-        app: helloworld-server
+        app: helloworld-grpc-server
     spec:
       containers:
       - name: server
-        image: helloworld:latest
-        imagePullPolicy: Never
+        image: fkarakas/helloworld-grpc:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 50051
         resources:
@@ -41,16 +43,6 @@ spec:
           requests:
             memory: "50Mi"
             cpu: "100m"
-#        readinessProbe:
-#          tcpSocket:
-#            port: 50051
-#          initialDelaySeconds: 5
-#          periodSeconds: 10
-#        livenessProbe:
-#          tcpSocket:
-#            port: 50051
-#          initialDelaySeconds: 15
-#          periodSeconds: 20
         env:
         - name: MODE
           value: "server"
@@ -63,12 +55,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: helloworld-server
+  name: helloworld-grpc-server
 spec:
   type: ClusterIP
   clusterIP: None
   selector:
-    app: helloworld-server
+    app: helloworld-grpc-server
   ports:
   - protocol: TCP
     port: 50051
