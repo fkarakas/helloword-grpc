@@ -19,14 +19,14 @@ metadata:
   labels:
     app: helloworld-grpc-server
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: helloworld-grpc-server
   template:
     metadata:
       annotations:
-        linkerd.io/inject: enabled
+        linkerd.io/inject: disabled
       labels:
         app: helloworld-grpc-server
     spec:

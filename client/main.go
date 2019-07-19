@@ -8,13 +8,15 @@ import (
 
 	pb "grpc/helloworld/proto"
 
+	"github.com/sercand/kuberesolver"
 	"google.golang.org/grpc"
-	//"google.golang.org/grpc/balancer/roundrobin"
-	//"google.golang.org/grpc/resolver"
+	"google.golang.org/grpc/balancer/roundrobin"
+	"google.golang.org/grpc/resolver"
 )
 
 var (
 	address     = nvl(os.Getenv("SERVER"), "localhost:50051")
+	lb          = nvl(os.Getenv("LB"), "")
 	defaultName = nvl(os.Getenv("POD_IP"), "<undefined>")
 )
 
@@ -22,20 +24,29 @@ func nvl(value, defaultValue string) string {
 	if value == "" {
 		return defaultValue
 	}
-
 	return value
+}
+
+func DialWithLoadBalancer(lb string, addr string) (*grpc.ClientConn, error) {
+	switch lb {
+	case "dns":
+		resolver.SetDefaultScheme("dns")
+		return grpc.Dial(address, grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
+	case "kube":
+		kuberesolver.RegisterInCluster()
+		//return grpc.Dial("kubernetes:///service-name.namespace:portname", grpc.WithInsecure())
+		return grpc.Dial("kubernetes:///"+address, grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
+	default:
+		return grpc.Dial(address, grpc.WithInsecure())
+	}
 }
 
 func main() {
 	log.Printf("server: %s client ip: %s", address, defaultName)
 
-	//resolver.SetDefaultScheme("dns")
-	//conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
-
-	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := DialWithLoadBalancer(lb, address)
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		log.Fatalf("could not connect: %v", err)
 	}
 	defer conn.Close()
 	c := pb.NewGreeterClient(conn)
