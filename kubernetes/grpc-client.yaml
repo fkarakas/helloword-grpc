@@ -35,7 +35,7 @@ spec:
         - name: LB
           value: "kube"
         - name: SERVER
-          value: "helloworld-grpc-server.fatih:50051"
+          value: "helloworld-grpc-server.default:50051"
           #value: "haproxy:50051"
           #value: "nginx:50051"
         - name: POD_IP
@@ -47,7 +47,7 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   name: endpoints-reader-role
-  namespace: fatih
+  namespace: default
 rules:
 - apiGroups: [""]
   resources:
@@ -65,17 +65,17 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: endpoints-reader-sa
-  namespace: fatih
+  namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: RoleBinding
 metadata:
   name:  endpoints-reader-rb
-  namespace: fatih
+  namespace: default
 subjects:
 - kind: ServiceAccount
   name: endpoints-reader-sa
-  namespace: fatih
+  namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
